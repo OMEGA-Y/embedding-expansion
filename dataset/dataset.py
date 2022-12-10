@@ -23,7 +23,7 @@ class ImageData(Dataset):
 
     def __getitem__(self, item):
         image, instance_id, category_id, view_id, bbox = self.dataset[item]        
-        image = PIL.Image.open(image)
+        image = PIL.Image.open(image).convert('RGB')
 
         if bbox is not None:
             x, y, w, h = bbox

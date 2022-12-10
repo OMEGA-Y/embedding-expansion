@@ -14,16 +14,11 @@ import os
 from .embedding_aug import get_embedding_aug
 
 def euclidean_dist(x, y, clip_min=1e-12, clip_max=1e12):
-    m, n = x.shape[0], y.shape[0]
+    
+    x = x.unsqueeze(0)
+    y = y.unsqueeze(0)
 
-    squared_x = torch.pow(x, 2).sum(axis=1, keepdims=True).broadcast_to((m, n))
-    squared_y = torch.pow(y, 2).sum(axis=1, keepdims=True).broadcast_to((n, m)).T
-
-    dist = squared_x + squared_y
-    dist = dist - 2 * torch.dot(x, y.T)
-    dist = dist.clip(a_min=clip_min, a_max=clip_max).sqrt()
-
-    return dist
+    return torch.cdist(x,y,p=2).squeeze(0)
 
 
 class HPHNTripletLoss(torch.nn.Module):
@@ -53,7 +48,7 @@ class HPHNTripletLoss(torch.nn.Module):
             loss = torch.relu(dist_ap - dist_an + self.margin)
         total_time = time.time() - total_start_time
 
-        return loss
+        return loss.mean()
 
     def hard_example_mining(self, dist_mat, labels, return_inds=False):
         assert len(dist_mat.shape) == 2
@@ -61,20 +56,20 @@ class HPHNTripletLoss(torch.nn.Module):
 
         N = dist_mat.shape[0]
 
-        is_pos = torch.equal(labels.broadcast_to((N, N)), labels.broadcast_to((N, N)).T).astype('float32')
-        is_neg = torch.not_equal(labels.broadcast_to((N, N)), labels.broadcast_to((N, N)).T).astype('float32')
+        is_pos = torch.eq(labels.repeat(N, 1), labels.repeat(N, 1).T)
+        is_neg = torch.ne(labels.repeat(N, 1), labels.repeat(N, 1).T)
 
         dist_pos = dist_mat * is_pos
         if self.n_inner_pts != 0:
-            dist_ap = torch.max(dist_pos[:self.batch_size, :self.batch_size], axis=1)
+            dist_ap = torch.max(dist_pos[:self.batch_size, :self.batch_size], axis=1)[0]
         else:
-            dist_ap = torch.max(dist_pos, axis=1)
+            dist_ap = torch.max(dist_pos, axis=1)[0]
 
-        dist_neg = dist_mat * is_neg + torch.max(dist_mat, axis=1, keepdims=True) * is_pos
-        dist_an = torch.min(dist_neg, axis=1)
+        dist_neg = dist_mat * is_neg + torch.max(dist_mat, axis=1, keepdims=True)[0] * is_pos
+        dist_an = torch.min(dist_neg, axis=1)[0]
 
         if self.n_inner_pts != 0:
             num_group = N // self.batch_size
-            dist_an = torch.min(torch.reshape(dist_an, (num_group, self.batch_size)), axis=0) # include synthetic positives
+            dist_an = torch.min(torch.reshape(dist_an, (num_group, self.batch_size)), axis=0)[0] # include synthetic positives
 
         return dist_ap, dist_an

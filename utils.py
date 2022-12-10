@@ -7,12 +7,6 @@ from tqdm import tqdm
 import torch.nn.functional as F
 import math
 
-def to_cuda(batch):
-    for key, value in batch.items():
-        if isinstance(value, torch.Tensor):
-            batch[key] = value.cuda()
-    return batch
-
 def l2_norm(input):
     input_size = input.size()
     buffer = torch.pow(input, 2)
@@ -34,7 +28,6 @@ def calc_recall_at_k(T, Y, k):
         if t in torch.Tensor(y).long()[:k]:
             s += 1
     return s / (1. * len(T))
-
 
 def predict_batchwise(model, dataloader):
     device = "cuda"
@@ -70,10 +63,9 @@ def proxy_init_calc(model, dataloader):
     return proxy_mean
 
 def evaluate_cos(model, dataloader):
-    nb_classes = dataloader.dataset.nb_classes()
 
     # calculate embeddings with model and get targets
-    X, T = predict_batchwise(model, dataloader)
+    X, T, *_ = predict_batchwise(model, dataloader)
     X = l2_norm(X)
 
     # get predictions by assigning nearest 8 neighbors with cosine

@@ -2,12 +2,6 @@
 Copyright (c) 2020-present NAVER Corp.
 MIT license
 '''
-# encoding: utf-8
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import numpy as np
 import random
 
@@ -31,7 +25,7 @@ class Random2DTranslation(object):
         y_maxrange = new_height - self.height
         x1 = int(round(random.uniform(0, x_maxrange)))
         y1 = int(round(random.uniform(0, y_maxrange)))
-        croped_img = transforms.fixed_crop(resized_img, x1, y1, self.width, self.height)
+        croped_img = transforms.functional.crop(resized_img, x1, y1, self.width, self.height)
         return croped_img
 
 

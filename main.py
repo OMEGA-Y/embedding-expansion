@@ -27,16 +27,16 @@ from model import Model
 from loss import HPHNTripletLoss
 
 parser = argparse.ArgumentParser(description='Embedding Expansion PyTorch codes')
-parser.add_argument('--gpu_id', default = 0, type = int)
+parser.add_argument('--gpu_id', default = 1, type = int)
 parser.add_argument('--num_workers', default = 10, type = int)
 parser.add_argument('--model', default = 'googlenet', type = str)
 parser.add_argument('--epochs', default = 5000, type = int)
-parser.add_argument('--data_dir', default='./dataset', type=str)
+parser.add_argument('--data_dir', default='./data/CARS_196', type=str)
 parser.add_argument('--dataset', default='cub', help = 'Training dataset, e.g. cub, cars')
 parser.add_argument('--logpath', default='./logs', type = str)
 parser.add_argument('--batch_size', default = 128, type = int, dest = 'bs')
 parser.add_argument('--backbone', default = 'googlenet', type=str, help = 'Model for training')
-parser.add_argument('--loss', default = 'HPHNTriplet', type=str, help = 'Criterion for training')
+parser.add_argument('--loss', default = 'Triplet', type=str, help = 'Criterion for training')
 parser.add_argument('--optimizer', default = 'adam')
 parser.add_argument('--lr', default = 1e-4, type =float)
 parser.add_argument('--weight_decay', default = 5e-4, type =float)
@@ -89,13 +89,13 @@ def main():
 
     # DML Losses
     if args.loss == 'MS':
-        criterion = MultiSimilarityLoss().cuda()
+        criterion = losses.MultiSimilarityLoss().cuda()
     elif args.loss == 'Contrastive':
-        criterion = ContrastiveLoss().cuda()
+        criterion = losses.ContrastiveLoss().cuda()
     elif args.loss == 'Triplet':
-        criterion = TripletLoss().cuda()
+        criterion = losses.TripletLoss().cuda()
     elif args.loss == 'NPair':
-        criterion = NPairLoss().cuda()
+        criterion = losses.NPairLoss().cuda()
     elif args.loss == 'HPHNTriplet':
         criterion = HPHNTripletLoss(margin=args.margin, soft_margin=False, num_instances=args.num_instances, n_inner_pts=args.n_inner_pts, l2_norm=args.ee_l2norm).cuda()
 
@@ -132,8 +132,8 @@ def main():
         for batch_idx, batch in pbar:
 
             # To cuda
-            batch = utils.to_cuda(batch)
             images, instance_labels, category_labels, _ = batch
+            images, instance_labels = images.cuda(), instance_labels.cuda()
 
             # Compute loss
             embeddings = model(images)
