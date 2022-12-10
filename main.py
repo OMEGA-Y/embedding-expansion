@@ -65,8 +65,12 @@ def main():
     # define args more
     args.train_meta = './meta/CARS196/train.txt'
     args.test_meta = './meta/CARS196/test.txt'
-    args.lr_decay_step = [int(epoch) for epoch in args.lr_decay_step.split(',')]
-    args.recall_k = [int(k) for k in args.recall_k.split(',')]
+    
+    args.lr_decay_epochs = [int(epoch) for epoch in args.lr_decay_epochs.split(',')]
+    args.recallk = [int(k) for k in args.recallk.split(',')]
+
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_idx)
+    args.ctx = [mx.cpu()]
     print(args)
 
     # Set random seed
