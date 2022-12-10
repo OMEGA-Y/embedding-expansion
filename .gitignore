@@ -19,4 +19,9 @@ test
 # vim debugger
 .vimspector.json
 
+wandb/
+.npy
+logs/
+
+
 check.py
