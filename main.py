@@ -13,6 +13,7 @@ from tqdm import *
 import wandb
 
 from loss import *
+import random, utils 
 # import random, dataset, utils, losses, net
 # from net.resnet import *
 # from net.googlenet import *
@@ -21,28 +22,16 @@ from loss import *
 
 #----------------
 
-
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
-from __future__ import unicode_literals
-
-import mxnet as mx
-
 import dataset as D
 import transforms as T
 from model import Model
 from loss import HPHNTripletLoss
-from runner import Trainer, Evaluator
-from util import SummaryWriter
-
-# define argparse
 
 parser = argparse.ArgumentParser(description='Embedding Expansion PyTorch codes')
 parser.add_argument('--gpu_id', default = 0, type = int)
 parser.add_argument('--num_workers', default = 10, type = int)
 parser.add_argument('--epochs', default = 5000, type = int, dest = 'nb_epochs')
-parser.add_argument('--datapath', default='./dataset', type=str)
+parser.add_argument('--data_dir', default='./dataset', type=str)
 parser.add_argument('--dataset', default='cub', help = 'Training dataset, e.g. cub, cars')
 parser.add_argument('--logpath', default='./logs', type = str)
 parser.add_argument('--batch_size', default = 128, type = int, dest = 'bs')
@@ -62,18 +51,6 @@ parser.add_argument('--n_inner_pts', default=2, type=int, help='the number of in
 parser.add_argument('--ee_l2norm', default=True, type=lambda s: s.lower() in ['true', 't', 'yes', '1'], help='whether do l2 normalizing augmented embeddings')
 parser.add_argument('--soft_margin', default=False, type=lambda s: s.lower() in ['true', 't', 'yes', '1'], help='parameter for hphn triplet loss')
 parser.add_argument('--img_size', default=227, type=int, help='width and height of input image')
-#---------------
-
-parser.add_argument('--base_lr_mult', default=1.0, type=float,
-                    help='scale for gradients calculated at backbone')
-parser.add_argument('--eval_epoch_term', default=50, type=int,
-                    help='check every eval_epoch_term')
-parser.add_argument('--beta', default=1.2, type=float,
-                    help='beta is beta')
-parser.add_argument('--start_epoch', default=0, type=int,
-                    help='start epoch')
-parser.add_argument('--summary_step', default=10, type=int,
-                    help='write summary every summary_step')
 
 def main():
     args = parser.parse_args()
@@ -100,7 +77,7 @@ def main():
     torch.cuda.manual_seed_all(seed) # set random seed for all gpus
 
     # Load model
-    model = Model(args.embed_dim, args.ctx)
+    model = Model(args.embed_dim)
     model.hybridize()
 
     # Device setup
@@ -123,100 +100,83 @@ def main():
 
     # Optimizer Setting
     if args.optimizer == 'sgd':
-	opt = torch.optim.SGD(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay, momentum = 0.9, nesterov=True)
+        opt = torch.optim.SGD(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay, momentum = 0.9, nesterov=True)
     elif args.optimizer == 'adam':
-	opt = torch.optim.Adam(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay)
+        opt = torch.optim.Adam(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay)
     elif args.optimizer == 'rmsprop':
-	opt = torch.optim.RMSprop(params=model.parameters(), lr=float(args.lr), alpha=0.9, weight_decay = args.weight_decay, momentum = 0.9)
+        opt = torch.optim.RMSprop(params=model.parameters(), lr=float(args.lr), alpha=0.9, weight_decay = args.weight_decay, momentum = 0.9)
     elif args.optimizer == 'adamw':
-	opt = torch.optim.AdamW(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay)
+        opt = torch.optim.AdamW(params=model.parameters(), lr=float(args.lr), weight_decay = args.weight_decay)
 
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=args.lr_decay_step, gamma = args.lr_decay_gamma)
 
-    # Load image transform
+    # Dataset initialization
     train_transform, test_transform = T.get_transform(image_size=args.img_size)
-
-    # Load data loader
     train_loader, test_loader = D.get_data_loader(args.data_dir, args.train_meta, args.test_meta, train_transform, test_transform,
                                                   args.batch_size, args.num_instances, args.num_workers)
 
 
-    # LR scheduler
-    print("steps in epoch:", args.lr_decay_step)
-    steps = list(map(lambda x: x*len(train_loader) , args.lr_decay_step))
-    print("steps in iter:", steps)
-    scheduler = torch.optim.lr_scheduler.MultiStepLR(opt, milestones=steps, gamma = args.lr_decay_gamma)
 
-#-----------------------
+    losses_list = []
+    best_recall=[0]
+    best_epoch = 0
 
-    # Load logger and saver
-    summary_writer = SummaryWriter(os.path.join(args.save_dir, 'tensorboard_log'))
+    # Training 
+    for epoch in range(0, args.epochs):
+        model.train()
 
+        losses_per_epoch = []
+        pbar = tqdm(enumerate(train_loader))
 
-    # Load trainer & evaluator
-    trainer   = Trainer(model, loss, optimizer, train_loader, summary_writer, args.ctx,
-                        summary_step=args.summary_step,
-                        lr_schedule=lr_schedule)
-    
-    evaluator = Evaluator(model, test_loader, args.ctx)
-    best_metrics = [0.0]  # all query
+        for batch_idx, batch in pbar:
 
-    global_step = args.start_epoch * len(train_loader)
-    
-    # Enter to training loop
-    print("base lr mult:", args.base_lr_mult)
-    for epoch in range(args.start_epoch, args.epochs):
-        model.backbone.collect_params().setattr('lr_mult', args.base_lr_mult)
-            
-        trainer.train(epoch)
-        global_step = (epoch + 1) * len(train_loader)
-        if (epoch + 1) % args.eval_epoch_term == 0:
-            old_best_metric = best_metrics[0]
-            # evaluate_and_log(summary_writer, evaluator, ranks, step, epoch, best_metrics)
-            best_metrics = evaluate_and_log(summary_writer, evaluator, args.recallk,
-                                        global_step, epoch + 1,
-                                        best_metrics=best_metrics)
-            if best_metrics[0] != old_best_metric:
-                save_path = os.path.join(args.save_dir, 'model_epoch_%05d.params' % (epoch + 1))
-                model.save_parameters(save_path)
-        sys.stdout.flush()
+            # To cuda
+            batch = utils.to_cuda(batch)
+            images, instance_labels, category_labels, _ = batch
 
-def add_best_values_summary(summary_writer, global_step, epoch, recallk, best_recall):
-    if summary_writer is None:
-        return
-    summary_writer.add_scalar('metric/R%d/best' % (recallk), best_recall, global_step)
-    summary_writer.add_scalar('metric_epoch/R%d/best' % (recallk), best_recall, epoch)
+            # Compute loss
+            embeddings = model(images)
+            loss = criterion(embeddings, instance_labels)
 
-def add_summary(summary_writer, step, epoch, ranks, recall_at_ranks):
-    for recallk, recall in zip(ranks, recall_at_ranks):
-        if summary_writer is not None:
-            summary_writer.add_scalar('metric/R%d' % (recallk), recall, step)
-            summary_writer.add_scalar('metric_epoch/R%d' % (recallk), recall, epoch)
-        print("R@{:3d}: {:.4f}".format(recallk, recall))
+            opt.zero_grad()
+            loss.backward()
 
-def evaluate_and_log(summary_writer, evaluator, ranks, step, epoch, best_metrics):
-    metrics = []
+            losses_per_epoch.append(loss.data.cpu().numpy())
 
-    distmat, labels = evaluator.get_distmat()
-    recall_at_ranks = evaluator.get_metric_at_ranks(distmat, labels, ranks)
+            opt.step()
 
-    add_summary(summary_writer, step, epoch, ranks, recall_at_ranks)
+            pbar.set_description(
+                'Train Epoch: {} [{}/{} ({:.0f}%)] Loss: {:.6f}'.format(
+                epoch, batch_idx + 1, len(train_loader),
+                100. * batch_idx / len(train_loader),
+                loss.item()))
 
-    metrics.append(recall_at_ranks[0])
+	losses_list.append(np.mean(losses_per_epoch))
+	wandb.log({'loss': losses_list[-1]}, step=epoch)
+	scheduler.step()
 
-    for idx, best_recall1 in enumerate(best_metrics):
-        recall1 = metrics[idx]
-        if recall1 > best_recall1:
-            best_recall1 = recall1
-            best_metrics[idx] = best_recall1
+	if(epoch >= 0):
+            with torch.no_grad():
+		print("**Evaluating...**")
+                Recalls = utils.evaluate_cos(model, test_loader)
 
-            add_best_values_summary(summary_writer, step, epoch if epoch is not None else None,
-                                    ranks[0], best_recall1)
+            # Logging Evaluation Score
+            for i in range(4):
+                wandb.log({"R@{}".format(2**i): Recalls[i]}, step=epoch)
 
-    return best_metrics
+            # Best model save
+            if best_recall[0] < Recalls[0]:
+		best_recall = Recalls
+		best_epoch = epoch
+		if not os.path.exists('{}'.format(LOG_DIR)):
+                    os.makedirs('{}'.format(LOG_DIR))
+		torch.save({'model_state_dict':model.state_dict()}, '{}/{}_{}_best.pth'.format(LOG_DIR, args.dataset, args.model))
+		with open('{}/{}_{}_best_results.txt'.format(LOG_DIR, args.dataset, args.model), 'w') as f:
+                    f.write('Best Epoch: {}\n'.format(best_epoch))
+                    for i in range(4):
+                        f.write("Best Recall@{}: {:.4f}\n".format(2**i, best_recall[i] * 100))
 
 
 if __name__ == '__main__':
-    # https://github.com/dmlc/gluon-cv/issues/493
-    sys.setrecursionlimit(2000)
 
     main()

@@ -15,3 +15,8 @@ tags
 
 # for test
 test
+
+# vim debugger
+.vimspector.json
+
+check.py

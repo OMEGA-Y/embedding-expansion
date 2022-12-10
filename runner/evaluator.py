@@ -15,14 +15,13 @@ import numpy as np
 
 
 class Evaluator(object):
-    def __init__(self, model, test_loader, ctx):
+    def __init__(self, model, test_loader):
         self.model = model
         self.test_loader = test_loader
-        self.ctx = ctx
 
     def _eval_step(self, inputs):
         images, instance_ids, category_ids, view_ids = inputs
-        data = mx.gluon.utils.split_and_load(images, self.ctx, even_split=False)
+        data = mx.gluon.utils.split_and_load(images, even_split=False)
         instance_ids = instance_ids.asnumpy()
         view_ids = view_ids.asnumpy()
         feats = []

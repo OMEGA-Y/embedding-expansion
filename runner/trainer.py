@@ -13,7 +13,7 @@ import time
 
 
 class Trainer(object):
-    def __init__(self, model, loss, optimizer, data_loader, summary_writer, ctx,
+    def __init__(self, model, loss, optimizer, data_loader, summary_writer, 
                  summary_step,                 
                  lr_schedule):
         self.model = model
@@ -21,16 +21,15 @@ class Trainer(object):
         self.optimizer = optimizer
         self.summary_writer = summary_writer
         self.data_loader = data_loader
-        self.ctx = ctx
         self.summary_step = summary_step
         self.lr_schedule = lr_schedule
 
     def _train_step(self, inputs):
         images, instance_ids, category_ids, _ = inputs
         batch_size = images.shape[0]
-        data = mx.gluon.utils.split_and_load(images, self.ctx)
-        instance_label = mx.gluon.utils.split_and_load(instance_ids, self.ctx)
-        category_label = mx.gluon.utils.split_and_load(category_ids, self.ctx)
+        data = mx.gluon.utils.split_and_load(images)
+        instance_label = mx.gluon.utils.split_and_load(instance_ids)
+        category_label = mx.gluon.utils.split_and_load(category_ids)
         
         loss_list = []
         with mx.autograd.record():
