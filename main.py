@@ -12,8 +12,7 @@ from torch.utils.data.dataloader import default_collate
 from tqdm import *
 import wandb
 
-from loss import *
-import random, utils 
+import random, utils, losses
 # import random, dataset, utils, losses, net
 # from net.resnet import *
 # from net.googlenet import *
@@ -30,7 +29,8 @@ from loss import HPHNTripletLoss
 parser = argparse.ArgumentParser(description='Embedding Expansion PyTorch codes')
 parser.add_argument('--gpu_id', default = 0, type = int)
 parser.add_argument('--num_workers', default = 10, type = int)
-parser.add_argument('--epochs', default = 5000, type = int, dest = 'nb_epochs')
+parser.add_argument('--model', default = 'googlenet', type = str)
+parser.add_argument('--epochs', default = 5000, type = int)
 parser.add_argument('--data_dir', default='./dataset', type=str)
 parser.add_argument('--dataset', default='cub', help = 'Training dataset, e.g. cub, cars')
 parser.add_argument('--logpath', default='./logs', type = str)
@@ -55,8 +55,7 @@ parser.add_argument('--img_size', default=227, type=int, help='width and height 
 def main():
     args = parser.parse_args()
 
-    LOG_DIR = args.logpath + '/logs_{}/{}_{}_embedding{}_alpha{}_mrg{}_{}_lr{}_batch{}'.format(args.dataset, args.model, args.loss, args.embedding_dim, args.alpha, 
-                                                                                                args.margin, args.optimizer, args.lr, args.bs)
+    LOG_DIR = args.logpath + '/logs_{}/{}_{}_embedding{}_alpha{}_mrg{}_{}_lr{}_batch{}'.format(args.dataset, args.model, args.loss, args.embedding_dim, args.alpha, args.margin, args.optimizer, args.lr, args.bs)
 
     # wandb
     wandb.init(project=args.dataset, entity="cvmetriclearning", notes=LOG_DIR)
@@ -66,11 +65,10 @@ def main():
     args.train_meta = './meta/CARS196/train.txt'
     args.test_meta = './meta/CARS196/test.txt'
     
-    args.lr_decay_epochs = [int(epoch) for epoch in args.lr_decay_epochs.split(',')]
-    args.recallk = [int(k) for k in args.recallk.split(',')]
+    args.lr_decay_epochs = [int(epoch) for epoch in args.lr_decay_step.split(',')]
+    args.recall_k = [int(k) for k in args.recall_k.split(',')]
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_idx)
-    args.ctx = [mx.cpu()]
+    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
     print(args)
 
     # Set random seed
@@ -81,13 +79,12 @@ def main():
     torch.cuda.manual_seed_all(seed) # set random seed for all gpus
 
     # Load model
-    model = Model(args.embed_dim)
-    model.hybridize()
+    model = Model(args.embedding_dim)
 
     # Device setup
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
-    model = nn.DataParallel(model)
+    model = torch.nn.DataParallel(model)
     model.to(device)
 
     # DML Losses
@@ -117,7 +114,7 @@ def main():
     # Dataset initialization
     train_transform, test_transform = T.get_transform(image_size=args.img_size)
     train_loader, test_loader = D.get_data_loader(args.data_dir, args.train_meta, args.test_meta, train_transform, test_transform,
-                                                  args.batch_size, args.num_instances, args.num_workers)
+                                                  args.bs, args.num_instances, args.num_workers)
 
 
 
@@ -155,13 +152,13 @@ def main():
                 100. * batch_idx / len(train_loader),
                 loss.item()))
 
-	losses_list.append(np.mean(losses_per_epoch))
-	wandb.log({'loss': losses_list[-1]}, step=epoch)
-	scheduler.step()
+        losses_list.append(np.mean(losses_per_epoch))
+        wandb.log({'loss': losses_list[-1]}, step=epoch)
+        scheduler.step()
 
-	if(epoch >= 0):
+        if(epoch >= 0):
             with torch.no_grad():
-		print("**Evaluating...**")
+                print("**Evaluating...**")
                 Recalls = utils.evaluate_cos(model, test_loader)
 
             # Logging Evaluation Score
@@ -170,12 +167,12 @@ def main():
 
             # Best model save
             if best_recall[0] < Recalls[0]:
-		best_recall = Recalls
-		best_epoch = epoch
-		if not os.path.exists('{}'.format(LOG_DIR)):
+                best_recall = Recalls
+                best_epoch = epoch
+                if not os.path.exists('{}'.format(LOG_DIR)):
                     os.makedirs('{}'.format(LOG_DIR))
-		torch.save({'model_state_dict':model.state_dict()}, '{}/{}_{}_best.pth'.format(LOG_DIR, args.dataset, args.model))
-		with open('{}/{}_{}_best_results.txt'.format(LOG_DIR, args.dataset, args.model), 'w') as f:
+                torch.save({'model_state_dict':model.state_dict()}, '{}/{}_{}_best.pth'.format(LOG_DIR, args.dataset, args.model))
+                with open('{}/{}_{}_best_results.txt'.format(LOG_DIR, args.dataset, args.model), 'w') as f:
                     f.write('Best Epoch: {}\n'.format(best_epoch))
                     for i in range(4):
                         f.write("Best Recall@{}: {:.4f}\n".format(2**i, best_recall[i] * 100))

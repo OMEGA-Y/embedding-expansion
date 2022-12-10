@@ -1,0 +1,5 @@
+
+Namespace(alpha=10, backbone='googlenet', bs=128, data_dir='./dataset', dataset='cub', ee_l2norm=True, embedding_dim=512, gpu_id=0, img_size=227, logpath='./logs', loss='HPHNTriplet', lr=0.0001, lr_decay_epochs=[10, 20, 40, 80], lr_decay_gamma=0.5, lr_decay_step='10,20,40,80', margin=1e-05, model='googlenet', n_inner_pts=2, nb_epochs=5000, num_instances=32, num_workers=10, optimizer='adam', recall_k=[1, 2, 4, 8], soft_margin=False, test_meta='./meta/CARS196/test.txt', train_meta='./meta/CARS196/train.txt', weight_decay=0.0005)
+Downloading: "https://download.pytorch.org/models/googlenet-1378be20.pth" to /home/dev/.cache/torch/hub/checkpoints/googlenet-1378be20.pth
+
+

@@ -1,0 +1,62 @@
+2022-12-10 14:06:58,763 INFO    StreamThr :27961 [internal.py:wandb_internal():87] W&B internal server running at pid: 27961, started at: 2022-12-10 14:06:58.762101
+2022-12-10 14:06:58,766 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: status
+2022-12-10 14:06:58,770 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: status
+2022-12-10 14:06:58,780 DEBUG   SenderThread:27961 [sender.py:send():303] send: header
+2022-12-10 14:06:58,780 INFO    WriterThread:27961 [datastore.py:open_for_write():75] open: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/run-1vbx36w4.wandb
+2022-12-10 14:06:58,801 DEBUG   SenderThread:27961 [sender.py:send():303] send: run
+2022-12-10 14:06:59,355 INFO    SenderThread:27961 [dir_watcher.py:__init__():216] watching files in: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files
+2022-12-10 14:06:59,356 INFO    SenderThread:27961 [sender.py:_start_run_threads():928] run started: 1vbx36w4 with start time 1670681218.767923
+2022-12-10 14:06:59,356 DEBUG   SenderThread:27961 [sender.py:send():303] send: summary
+2022-12-10 14:06:59,356 INFO    SenderThread:27961 [sender.py:_save_file():1171] saving file wandb-summary.json with policy end
+2022-12-10 14:06:59,364 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: check_version
+2022-12-10 14:06:59,364 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: check_version
+2022-12-10 14:06:59,466 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: run_start
+2022-12-10 14:06:59,472 DEBUG   HandlerThread:27961 [system_info.py:__init__():31] System info init
+2022-12-10 14:06:59,473 DEBUG   HandlerThread:27961 [system_info.py:__init__():46] System info init done
+2022-12-10 14:06:59,473 INFO    HandlerThread:27961 [system_monitor.py:start():150] Starting system monitor
+2022-12-10 14:06:59,473 INFO    SystemMonitor:27961 [system_monitor.py:_start():116] Starting system asset monitoring threads
+2022-12-10 14:06:59,473 INFO    HandlerThread:27961 [system_monitor.py:probe():171] Collecting system info
+2022-12-10 14:06:59,474 INFO    SystemMonitor:27961 [interfaces.py:start():168] Started cpu
+2022-12-10 14:06:59,475 INFO    SystemMonitor:27961 [interfaces.py:start():168] Started disk
+2022-12-10 14:06:59,476 INFO    SystemMonitor:27961 [interfaces.py:start():168] Started gpu
+2022-12-10 14:06:59,477 INFO    SystemMonitor:27961 [interfaces.py:start():168] Started memory
+2022-12-10 14:06:59,477 INFO    SystemMonitor:27961 [interfaces.py:start():168] Started network
+2022-12-10 14:06:59,508 DEBUG   HandlerThread:27961 [system_info.py:probe():195] Probing system
+2022-12-10 14:06:59,514 DEBUG   HandlerThread:27961 [system_info.py:_probe_git():180] Probing git
+2022-12-10 14:06:59,532 DEBUG   HandlerThread:27961 [system_info.py:_probe_git():188] Probing git done
+2022-12-10 14:06:59,532 DEBUG   HandlerThread:27961 [system_info.py:probe():241] Probing system done
+2022-12-10 14:06:59,532 DEBUG   HandlerThread:27961 [system_monitor.py:probe():180] {'os': 'Linux-5.4.0-126-generic-x86_64-with-glibc2.17', 'python': '3.8.15', 'heartbeatAt': '2022-12-10T14:06:59.508371', 'startedAt': '2022-12-10T14:06:58.727341', 'docker': None, 'cuda': None, 'args': (), 'state': 'running', 'program': '/home/dev/workspace/embedding-expansion/main.py', 'codePath': 'main.py', 'git': {'remote': 'https://github.com/OMEGA-Y/embedding-expansion.git', 'commit': '0ed7ced8a9e597b04e4198cb67e6b6e0985380f6'}, 'email': 'science_co@naver.com', 'root': '/home/dev/workspace/embedding-expansion', 'host': '4b37dcde37f8', 'username': 'dev', 'executable': '/home/dev/anaconda3/envs/visionProject/bin/python', 'cpu_count': 6, 'cpu_count_logical': 12, 'cpu_freq': {'current': 1443.9606666666666, 'min': 1200.0, 'max': 3600.0}, 'cpu_freq_per_core': [{'current': 1806.773, 'min': 1200.0, 'max': 3600.0}, {'current': 1726.036, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.276, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.296, 'min': 1200.0, 'max': 3600.0}, {'current': 1507.835, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.313, 'min': 1200.0, 'max': 3600.0}, {'current': 1496.705, 'min': 1200.0, 'max': 3600.0}, {'current': 1554.764, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.458, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.567, 'min': 1200.0, 'max': 3600.0}, {'current': 2038.745, 'min': 1200.0, 'max': 3600.0}, {'current': 1199.76, 'min': 1200.0, 'max': 3600.0}], 'disk': {'total': 1832.2072448730469, 'used': 220.55255508422852}, 'gpu': 'NVIDIA GeForce GTX TITAN X', 'gpu_count': 2, 'gpu_devices': [{'name': 'NVIDIA GeForce GTX TITAN X', 'memory_total': 12802850816}, {'name': 'NVIDIA GeForce GTX TITAN X', 'memory_total': 12806127616}], 'memory': {'total': 62.71571731567383}}
+2022-12-10 14:06:59,532 INFO    HandlerThread:27961 [system_monitor.py:probe():181] Finished collecting system info
+2022-12-10 14:06:59,532 INFO    HandlerThread:27961 [system_monitor.py:probe():184] Publishing system info
+2022-12-10 14:06:59,532 DEBUG   HandlerThread:27961 [system_info.py:_save_pip():51] Saving list of pip packages installed into the current environment
+2022-12-10 14:06:59,533 DEBUG   HandlerThread:27961 [system_info.py:_save_pip():67] Saving pip packages done
+2022-12-10 14:06:59,533 DEBUG   HandlerThread:27961 [system_info.py:_save_conda():74] Saving list of conda packages installed into the current environment
+2022-12-10 14:07:00,360 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_created():275] file/dir created: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/conda-environment.yaml
+2022-12-10 14:07:00,361 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_created():275] file/dir created: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/requirements.txt
+2022-12-10 14:07:00,361 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_created():275] file/dir created: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/wandb-summary.json
+2022-12-10 14:07:03,817 DEBUG   HandlerThread:27961 [system_info.py:_save_conda():86] Saving conda packages done
+2022-12-10 14:07:03,818 INFO    HandlerThread:27961 [system_monitor.py:probe():186] Finished publishing system info
+2022-12-10 14:07:03,824 DEBUG   SenderThread:27961 [sender.py:send():303] send: files
+2022-12-10 14:07:03,825 INFO    SenderThread:27961 [sender.py:_save_file():1171] saving file wandb-metadata.json with policy now
+2022-12-10 14:07:03,842 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:07:03,843 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:07:04,091 DEBUG   SenderThread:27961 [sender.py:send():303] send: telemetry
+2022-12-10 14:07:04,091 DEBUG   SenderThread:27961 [sender.py:send():303] send: config
+2022-12-10 14:07:04,358 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/conda-environment.yaml
+2022-12-10 14:07:04,358 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_created():275] file/dir created: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/wandb-metadata.json
+2022-12-10 14:07:04,582 INFO    Thread-16 :27961 [upload_job.py:push():143] Uploaded file /tmp/tmp3xdkbgalwandb/10xise85-wandb-metadata.json
+2022-12-10 14:07:19,096 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:07:19,096 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:07:30,371 INFO    Thread-13 :27961 [dir_watcher.py:_on_file_modified():292] file/dir modified: /home/dev/workspace/embedding-expansion/wandb/run-20221210_140658-1vbx36w4/files/config.yaml
+2022-12-10 14:07:34,326 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:07:34,327 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:07:49,568 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:07:49,569 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:07:59,478 DEBUG   SystemMonitor:27961 [system_monitor.py:_start():130] Starting system metrics aggregation loop
+2022-12-10 14:07:59,480 DEBUG   SenderThread:27961 [sender.py:send():303] send: stats
+2022-12-10 14:08:04,802 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:08:04,803 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:08:20,039 DEBUG   HandlerThread:27961 [handler.py:handle_request():139] handle_request: stop_status
+2022-12-10 14:08:20,040 DEBUG   SenderThread:27961 [sender.py:send_request():317] send_request: stop_status
+2022-12-10 14:08:23,489 INFO    MainThread:27961 [internal.py:handle_exit():77] Internal process exited
+2022-12-10 14:08:23,490 WARNING MsgRouterThr:27961 [router.py:message_loop():74] EOFError seen in message_loop

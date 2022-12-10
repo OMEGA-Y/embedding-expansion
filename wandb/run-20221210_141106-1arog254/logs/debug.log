@@ -1,0 +1,25 @@
+2022-12-10 14:11:06,391 INFO    MainThread:28513 [wandb_setup.py:_flush():68] Configure stats pid to 28513
+2022-12-10 14:11:06,392 INFO    MainThread:28513 [wandb_setup.py:_flush():68] Loading settings from /home/dev/.config/wandb/settings
+2022-12-10 14:11:06,392 INFO    MainThread:28513 [wandb_setup.py:_flush():68] Loading settings from /home/dev/workspace/embedding-expansion/wandb/settings
+2022-12-10 14:11:06,392 INFO    MainThread:28513 [wandb_setup.py:_flush():68] Loading settings from environment variables: {'_require_service': 'True'}
+2022-12-10 14:11:06,392 INFO    MainThread:28513 [wandb_setup.py:_flush():68] Inferring run settings from compute environment: {'program_relpath': 'main.py', 'program': '/home/dev/workspace/embedding-expansion/main.py'}
+2022-12-10 14:11:06,393 INFO    MainThread:28513 [wandb_init.py:_log_setup():476] Logging user logs to /home/dev/workspace/embedding-expansion/wandb/run-20221210_141106-1arog254/logs/debug.log
+2022-12-10 14:11:06,393 INFO    MainThread:28513 [wandb_init.py:_log_setup():477] Logging internal logs to /home/dev/workspace/embedding-expansion/wandb/run-20221210_141106-1arog254/logs/debug-internal.log
+2022-12-10 14:11:06,394 INFO    MainThread:28513 [wandb_init.py:init():516] calling init triggers
+2022-12-10 14:11:06,395 INFO    MainThread:28513 [wandb_init.py:init():519] wandb.init called with sweep_config: {}
+config: {}
+2022-12-10 14:11:06,395 INFO    MainThread:28513 [wandb_init.py:init():569] starting backend
+2022-12-10 14:11:06,396 INFO    MainThread:28513 [wandb_init.py:init():573] setting up manager
+2022-12-10 14:11:06,410 INFO    MainThread:28513 [backend.py:_multiprocessing_setup():102] multiprocessing start_methods=fork,spawn,forkserver, using: spawn
+2022-12-10 14:11:06,422 INFO    MainThread:28513 [wandb_init.py:init():580] backend started and connected
+2022-12-10 14:11:06,434 INFO    MainThread:28513 [wandb_init.py:init():658] updated telemetry
+2022-12-10 14:11:06,455 INFO    MainThread:28513 [wandb_init.py:init():693] communicating run to backend with 60 second timeout
+2022-12-10 14:11:06,971 INFO    MainThread:28513 [wandb_run.py:_on_init():2006] communicating current version
+2022-12-10 14:11:07,041 INFO    MainThread:28513 [wandb_run.py:_on_init():2010] got version response 
+2022-12-10 14:11:07,042 INFO    MainThread:28513 [wandb_init.py:init():728] starting run threads in backend
+2022-12-10 14:11:11,465 INFO    MainThread:28513 [wandb_run.py:_console_start():1986] atexit reg
+2022-12-10 14:11:11,467 INFO    MainThread:28513 [wandb_run.py:_redirect():1844] redirect: SettingsConsole.WRAP_RAW
+2022-12-10 14:11:11,468 INFO    MainThread:28513 [wandb_run.py:_redirect():1909] Wrapping output streams.
+2022-12-10 14:11:11,469 INFO    MainThread:28513 [wandb_run.py:_redirect():1931] Redirects installed.
+2022-12-10 14:11:11,471 INFO    MainThread:28513 [wandb_init.py:init():765] run started, returning control to user process
+2022-12-10 14:11:11,487 INFO    MainThread:28513 [wandb_run.py:_config_callback():1163] config_cb None None {'gpu_id': 0, 'num_workers': 10, 'model': 'googlenet', 'nb_epochs': 5000, 'data_dir': './dataset', 'dataset': 'cub', 'logpath': './logs', 'bs': 128, 'backbone': 'googlenet', 'loss': 'HPHNTriplet', 'optimizer': 'adam', 'lr': 0.0001, 'weight_decay': 0.0005, 'lr_decay_gamma': 0.5, 'lr_decay_step': '10,20,40,80', 'embedding_dim': 512, 'alpha': 10, 'margin': 1e-05, 'recall_k': '1,2,4,8', 'num_instances': 32, 'n_inner_pts': 2, 'ee_l2norm': True, 'soft_margin': False, 'img_size': 227}
