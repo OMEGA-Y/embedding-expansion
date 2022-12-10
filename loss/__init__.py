@@ -9,3 +9,4 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 from .hphn_triplet import HPHNTripletLoss
+from .losses import *
